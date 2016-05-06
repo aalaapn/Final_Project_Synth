@@ -84,6 +84,15 @@ int main(){
 			LED_Off(0);
 			LED_Off(1);
 			LED_Off(2);
+			i=0;
+			while(i<100){
+				Accelerometer_GetState(&astate);
+				i=i+1;
+				j=astate.y*10*cos(i*abs(astate.x));
+				k=j;
+				debug_printf("DAC_DRV_Output: %d\r\n", k);
+				DAC_DRV_Output(instance, k);
+	  }
 		}
 		while(Buttons_GetState()==1){
 			LED_Off(0);
@@ -91,17 +100,20 @@ int main(){
 			LED_Off(2);
 			LED_On(0);
 		  i=0;
-			while(i<2000){
+			while(i<500){
 				Accelerometer_GetState(&astate);
 				i=i+5;
 				j=100*tan(40*i)+1000;
-				if(fmod(i,3)==0){
+				if(fmod(i,4)==0){
 				k=i*20;
 				}
-				else{
-				k=i*500;
+				else if(fmod(i,3)==0){
+				k=i*50;
 				}
-				debug_printf("DAC_DRV_Output: %d\r\n", fmod(i,3));
+				else if(fmod(i,7)==0){
+				k=i*100;
+				}
+				debug_printf("DAC_DRV_Output: %d\r\n", k);
 				DAC_DRV_Output(instance, k);
 	  }
 		}
