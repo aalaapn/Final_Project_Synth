@@ -50,7 +50,11 @@ uint32_t a=1;
 uint32_t b=2;
 uint32_t c=3;
 
-int averagerax(int numAve){
+/*Average Functions, each returns an average for a set of Magnetometer/Accelerometer x y z states,
+this smooths the information from the meters/ helps prevent spiking 
+*/
+
+int averagerax(int numAve, int freq){
 	int sumStates;
 	int divisor;
 	ACCELEROMETER_STATE astate;
@@ -58,13 +62,13 @@ int averagerax(int numAve){
 	sumStates = 0;
 	for(numAve; numAve!=0; numAve--){
 		Accelerometer_GetState(&astate);
-		sumStates=(sumStates+astate.x);
+		sumStates=((sumStates+astate.x)/freq);
 	}
 	sumStates=sumStates/divisor;
 	return sumStates;
 }
 
-int averageray(int numAve){
+int averageray(int numAve, int freq){
 	int sumStates;
 	int divisor;
 	ACCELEROMETER_STATE astate;
@@ -72,7 +76,7 @@ int averageray(int numAve){
 	sumStates = 0;
 	for(numAve; numAve!=0; numAve--){
 		Accelerometer_GetState(&astate);
-		sumStates=(sumStates+astate.y);
+		sumStates=((sumStates+astate.y)/freq);
 	}
 	sumStates=sumStates/divisor;
 	return sumStates;
@@ -162,88 +166,97 @@ int main(){
 //	debug_printf("DAC_DRV_Output: %d\r\n", instance);
 	
 	while(1){
-		//LED_SetOut(a);
-		//LED_SetOut(b);
-		//LED_SetOut(c);
-		//LED_SetOut(a);
-		//LED_SetOut(b);
-		//LED_SetOut(c);
-		//LED_On(1);
-//		while(Buttons_GetState()==0){
-//			LED_Off(0);
-//			LED_Off(1);
-//			LED_Off(2);
-//			i=0;
-//			while(i<100){
-//				Accelerometer_GetState(&astate);
-//				i=i+1;
-//				j=abs(astate.y)*cos(i*abs(astate.x));
-//				k=j;
-//				debug_printf("DAC_DRV_Output: %d\r\n", k);
-//				DAC_DRV_Output(instance, k);
-//	  }
-//		}
-//		while(Buttons_GetState()==1){
-//			LED_Off(0);
-//			LED_Off(1);
-//			LED_Off(2);
-//			LED_On(0);
-//		  i=0;
-//			while(i<500){
-//				Accelerometer_GetState(&astate);
-//				i=i+5;
-//				j=10*sin(100*i)+10;
-//				k=j;
-//				debug_printf("DAC_DRV_Output: %d\r\n", k);
-//				DAC_DRV_Output(instance, k);
-//	  }
-//		}
-//		while(Buttons_GetState()==2){
-//			LED_Off(0);
-//			LED_Off(1);
-//			LED_Off(2);
-//			LED_On(1);
-//			 i=0;
-//			while(i<100){
-//				Accelerometer_GetState(&astate);
-//				i=i+1;
-//				j=20*sin(400*i)+20;
-//				k=j;
-//				debug_printf("DAC_DRV_Output: %d\r\n", k);
-//				DAC_DRV_Output(instance, k);
-//	  }
-//		}
-//		while(Buttons_GetState()==3){
-//			LED_Off(0);
-//			LED_Off(1);
-//			LED_Off(2);
-//			LED_On(2);
-//			 i=0;
-//			while(i<100){
-//				Accelerometer_GetState(&astate);
-//				i=i+1;
-//				j=30*sin(300*i)+30;
-//				k=j;
-//				debug_printf("DAC_DRV_Output: %d\r\n", k);
-//				DAC_DRV_Output(instance, k);
-//	  }
-//		}
-//		else{
-//		while(i<100000){
-//			Accelerometer_GetState(&astate);
-//			i=i+.0001;
-//			j=500*astate.x*sin(400*i)+3000;
-//			k=j;
-//			debug_printf("DAC_DRV_Output: %d\r\n", k);
-//			DAC_DRV_Output(instance, k);
-//	  }
-//		LED_Off(1);
+		  LED_SetOut(a);
+		  LED_SetOut(b);
+		  LED_SetOut(c);
+		  LED_SetOut(a);
+		  LED_SetOut(b);
+		  LED_SetOut(c);
+			LED_On(1);
+		while(Buttons_GetState()==0){
+			//No buttons pressed
+			LED_Off(0);
+			LED_Off(1);
+			LED_Off(2);
+			i=0;
+		while(i<100){
 
-//	}
+				i=i+1;
+				int aystate= averageray(3,30);
+				int axstate= averagerax(3,1);
+				j=(aystate)*cos(i*400)+(aystate);
+				k=j;
+				debug_printf("DAC_DRV_Output: %d\r\n", k);
+				DAC_DRV_Output(instance, k);
+	  }
+		}
+		while(Buttons_GetState()==1){
+			//Red Light
+			LED_Off(0);
+			LED_Off(1);
+			LED_Off(2);
+			LED_On(0);
+		  i=0;
+			while(i<500){
+				Accelerometer_GetState(&astate);
+				i=i+5;
+				j=10*sin(100*i)+10;
+				k=j;
+				debug_printf("DAC_DRV_Output: %d\r\n", k);
+				DAC_DRV_Output(instance, k);
+	  }
+		}
+		while(Buttons_GetState()==2){
+			//Blue Light
+			LED_Off(0);
+			LED_Off(1);
+			LED_Off(2);
+			LED_On(1);
+			 i=0;
+			while(i<100){
+				Accelerometer_GetState(&astate);
+				i=i+1;
+				j=20*sin(400*i)+20;
+				k=j;
+				debug_printf("DAC_DRV_Output: %d\r\n", k);
+		DAC_DRV_Output(instance, k);
+	  }
+		}
+		while(Buttons_GetState()==3){
+			//Green Light
+			LED_Off(0);
+			LED_Off(1);
+			LED_Off(2);
+			LED_On(2);
+			 i=0;
+			while(i<100){
+				Accelerometer_GetState(&astate);
+				i=i+1;
+				j=30*sin(300*i)+30;
+				k=j;
+				debug_printf("DAC_DRV_Output: %d\r\n", k);
+	DAC_DRV_Output(instance, k);
+	  }
+		}
+		
+		/*
+		else{
+			while(i<100000){
+			Accelerometer_GetState(&astate);
+			i=i+.0001;
+			j=500*astate.x*sin(400*i)+3000;
+			k=j;
+			debug_printf("DAC_DRV_Output: %d\r\n", k);
+			DAC_DRV_Output(instance, k);
+	  }
+		LED_Off(1);
+
+	}
+		*/
 		
 		LED_Off(0);
-		ax=averagerax(5);
-		ay=averageray(5);
+		//ax=averagerax(5);
+		//ay=averageray(5,);
 		az=averageraz(5);
 		mx=averagermx(4);
 		my=averagermy(4);
